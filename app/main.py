@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.routes import users, health
+from app.middleware.rate_limit import rate_limit_middleware
 
 app = FastAPI(
     title="Memorum Test API",
@@ -16,6 +18,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(BaseHTTPMiddleware, dispatch=rate_limit_middleware)
 
 app.include_router(health.router)
 app.include_router(users.router, prefix="/users", tags=["users"])
